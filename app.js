@@ -90,7 +90,7 @@ function renderHero() {
   const { meta, stats, months, themes } = dataset;
 
   refs.heroTitle.textContent = "TLDR Data: A year in review";
-  refs.heroSubtitle.textContent = "TLDR Data #100 is out! Here are the themes and stories that shaped the data space. Thank you for subscribing, thank you to the awesome content creators!";
+  refs.heroSubtitle.innerHTML = 'TLDR Data #100 is out! Here are the themes and stories that shaped the data space. Thank you for subscribing, thank you to the awesome content creators!<br />If you are not following us yet, <a href="https://tldr.tech/data" target="_blank" rel="noreferrer">subscribe here</a>!';
   refs.heroStory.innerHTML = "";
   refs.heroStory.hidden = true;
 
