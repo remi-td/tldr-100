@@ -1,0 +1,10 @@
+.DS_Store
+__pycache__/
+*.pyc
+
+# Source material and local build inputs
+Database-design.md
+instructions.md
+scripts/
+data/*
+!data/site-data.json

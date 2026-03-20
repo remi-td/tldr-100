@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TLDR Data #100</title>
+    <meta
+      name="description"
+      content="An interactive celebration of TLDR Data's first 100 issues, mapping how the data and AI landscape shifted from April 2025 to March 2026."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-backdrop"></div>
+        <div class="hero-copy">
+          <p class="eyebrow">TLDR Data #100</p>
+          <h1 id="hero-title">Loading the year in motion...</h1>
+          <p class="hero-subtitle" id="hero-subtitle"></p>
+          <div class="hero-story" id="hero-story"></div>
+        </div>
+        <div class="hero-stats" id="hero-stats"></div>
+      </header>
+
+      <main>
+        <section class="section">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Key Themes</p>
+              <h2>The key themes</h2>
+            </div>
+          </div>
+          <div id="theme-cards" class="theme-lane"></div>
+        </section>
+
+        <section class="section atlas-section">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Theme Atlas</p>
+              <h2>The stories that bent the year</h2>
+            </div>
+            <p class="section-note">
+              Filter the graph by month. Article nodes stay clickable and the right rail tracks the current slice.
+            </p>
+          </div>
+
+          <div class="atlas-controls">
+            <div class="control-group">
+              <div class="control-label">Issues by month</div>
+              <div id="month-chips" class="chip-row"></div>
+            </div>
+          </div>
+
+          <div class="atlas-grid">
+            <div class="atlas-canvas-shell">
+              <div class="canvas-toolbar">
+                <div class="toolbar-copy">
+                  <div class="toolbar-title">Interactive constellation</div>
+                  <div class="toolbar-meta" id="graph-meta"></div>
+                </div>
+                <div class="zoom-controls">
+                  <button id="zoom-out" type="button">-</button>
+                  <button id="zoom-reset" type="button">Reset</button>
+                  <button id="zoom-in" type="button">+</button>
+                </div>
+              </div>
+
+              <svg id="graph" viewBox="0 0 1180 760" aria-label="Theme network graph">
+                <defs>
+                  <filter id="soft-glow">
+                    <feGaussianBlur stdDeviation="6" result="blur"></feGaussianBlur>
+                    <feMerge>
+                      <feMergeNode in="blur"></feMergeNode>
+                      <feMergeNode in="SourceGraphic"></feMergeNode>
+                    </feMerge>
+                  </filter>
+                </defs>
+                <rect class="graph-bg" x="0" y="0" width="1180" height="760"></rect>
+                <g id="graph-panzoom">
+                  <g id="graph-links"></g>
+                  <g id="graph-nodes"></g>
+                  <g id="graph-labels"></g>
+                </g>
+              </svg>
+            </div>
+
+            <aside class="detail-rail">
+              <div class="detail-card detail-card-primary">
+                <p class="eyebrow">Focused Slice</p>
+                <h3 id="selection-title">All 100 issues</h3>
+                <p id="selection-summary"></p>
+              </div>
+
+              <div class="detail-card" id="article-spotlight">
+                <p class="eyebrow">Article Spotlight</p>
+                <h3 id="spotlight-title">Pick a node to inspect it.</h3>
+                <p id="spotlight-summary"></p>
+                <div class="spotlight-meta" id="spotlight-meta"></div>
+                <a id="spotlight-link" class="spotlight-link is-disabled" href="#" target="_blank" rel="noreferrer">
+                  Open article
+                </a>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="section insights-section">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Signals</p>
+              <h2 id="insights-title">Thanks to our awesome thought leaders and content creators</h2>
+            </div>
+            <p class="section-note">The voices and teams that kept contributing standout ideas throughout the year.</p>
+          </div>
+
+          <div class="insight-grid">
+            <div class="insight-card insight-card-wide">
+              <h3>Creators & analysts</h3>
+              <div id="top-vendors" class="rank-list rank-list-long"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
