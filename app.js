@@ -89,8 +89,8 @@ function initialize() {
 function renderHero() {
   const { meta, stats, months, themes } = dataset;
 
-  refs.heroTitle.textContent = "TLDR Data: A year in review";
-  refs.heroSubtitle.innerHTML = 'TLDR Data #100 is out! Here are the themes and stories that shaped the data space. Thank you for subscribing, thank you to the awesome content creators!<br />If you are not following us yet, <a href="https://tldr.tech/data" target="_blank" rel="noreferrer">subscribe here</a>!';
+  refs.heroTitle.innerHTML = 'TLDR Data #100<br /><span class="hero-title-sub">A year in review</span>';
+  refs.heroSubtitle.innerHTML = 'From infrastructure to semantics, the shifts that shaped the data space this year.<br /><br />Thanks for reading, and to everyone building and sharing.<br /><br />New here? <a href="https://tldr.tech/data" target="_blank" rel="noreferrer">Subscribe to TLDR Data.</a>';
   refs.heroStory.innerHTML = "";
   refs.heroStory.hidden = true;
 

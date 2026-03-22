@@ -108,6 +108,13 @@ h1 {
   line-height: 0.93;
 }
 
+.hero-title-sub {
+  display: inline-block;
+  margin-top: 0.18em;
+  font-size: 0.62em;
+  line-height: 1;
+}
+
 h2 {
   font-size: clamp(2rem, 3vw, 3rem);
   line-height: 0.95;
@@ -483,6 +490,13 @@ h3 {
   scroll-snap-type: x proximity;
 }
 
+.mobile-scroll-note {
+  display: none;
+  margin: -8px 0 14px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
 .finding-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -772,5 +786,9 @@ h3 {
 
   .rank-list-long {
     grid-template-columns: 1fr;
+  }
+
+  .mobile-scroll-note {
+    display: block;
   }
 }
