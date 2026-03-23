@@ -213,21 +213,28 @@ function render() {
   renderFilterChips();
   const filtered = getFilteredArticles();
   const visible = filtered.slice(0, 140);
+  const spotlightArticle = pickSpotlightArticle(filtered);
 
   if (!visible.some((article) => article.id === state.selectedArticleId)) {
-    state.selectedArticleId = visible[0]?.id ?? null;
+    state.selectedArticleId = spotlightArticle?.id ?? visible[0]?.id ?? null;
   }
 
   renderSelection(filtered, visible);
-  renderSpotlight(visible.find((article) => article.id === state.selectedArticleId) || visible[0] || null);
+  renderSpotlight(visible.find((article) => article.id === state.selectedArticleId) || spotlightArticle || visible[0] || null);
   renderGraph(visible);
 }
 
 function getFilteredArticles() {
+  const centralityKey = getCentralityKey();
   return dataset.articles
     .filter((article) => (state.month === "all" ? true : article.month === state.month))
     .filter((article) => (state.theme === "all" ? true : article.theme_id === state.theme))
-    .sort((left, right) => right.score - left.score || right.featured_date.localeCompare(left.featured_date));
+    .sort(
+      (left, right) =>
+        right.score - left.score ||
+        (right[centralityKey] || 0) - (left[centralityKey] || 0) ||
+        right.featured_date.localeCompare(left.featured_date),
+    );
 }
 
 function renderSelection(filtered, visible) {
@@ -524,9 +531,7 @@ function buildSliceSummary(articles) {
   const leadTheme = getTheme(themeCounts[0].name);
   const secondTheme = themeCounts[1] ? getTheme(themeCounts[1].name) : null;
   const topTechs = techCounts.slice(0, 3).map((item) => item.name);
-  const standout = [...articles].sort(
-    (left, right) => right.score - left.score || right.featured_date.localeCompare(left.featured_date),
-  )[0];
+  const standout = pickCentralArticle(articles);
 
   const leadNarrative = describeThemeStory(leadTheme?.name, state.month === "all" ? "full-run" : "month");
   let summary = `${capitalizeFirst(lowercaseFirst(leadTheme.name))} ${leadNarrative}`;
@@ -546,6 +551,79 @@ function buildSliceSummary(articles) {
   }
 
   return summary;
+}
+
+function pickCentralArticle(articles) {
+  const centralityKey = getCentralityKey();
+
+  return [...articles].sort(
+    (left, right) =>
+      (right[centralityKey] || 0) - (left[centralityKey] || 0) ||
+      right.score - left.score ||
+      right.featured_date.localeCompare(left.featured_date),
+  )[0];
+}
+
+function pickSpotlightArticle(articles) {
+  const centralityKey = getCentralityKey();
+  const latestFeaturedDate = articles.length
+    ? Math.max(...articles.map((article) => Date.parse(article.featured_date)))
+    : 0;
+  const recentArticles = articles.filter((article) => {
+    const articleDate = Date.parse(article.featured_date);
+    const ageDays = latestFeaturedDate && articleDate ? Math.max(0, (latestFeaturedDate - articleDate) / 86400000) : 9999;
+    return ageDays <= 180;
+  });
+  const candidatePool = recentArticles.length ? recentArticles : articles;
+
+  return [...candidatePool].sort(
+    (left, right) =>
+      spotlightRank(right, centralityKey, latestFeaturedDate) - spotlightRank(left, centralityKey, latestFeaturedDate) ||
+      (right[centralityKey] || 0) - (left[centralityKey] || 0) ||
+      right.score - left.score ||
+      right.featured_date.localeCompare(left.featured_date),
+  )[0];
+}
+
+function getCentralityKey() {
+  return state.month !== "all" && state.theme !== "all"
+    ? "centrality_month_theme"
+    : state.month !== "all"
+      ? "centrality_month"
+      : state.theme !== "all"
+        ? "centrality_theme"
+        : "centrality_overall";
+}
+
+function spotlightRank(article, centralityKey, latestFeaturedDate) {
+  const articleDate = Date.parse(article.featured_date);
+  const ageDays = latestFeaturedDate && articleDate ? Math.max(0, (latestFeaturedDate - articleDate) / 86400000) : 9999;
+  const recencyBoost =
+    ageDays <= 45 ? 3.2 :
+    ageDays <= 90 ? 2.2 :
+    ageDays <= 180 ? 1.2 :
+    ageDays <= 270 ? 0.45 :
+    0;
+  const centrality = article[centralityKey] || 0;
+  const isolationPenalty = centrality === 0 ? 1.5 : 0;
+  const combinedScore = article.score + centrality * 1.6 - isolationPenalty;
+  const themeFitBoost = spotlightThemeFit(article);
+
+  return combinedScore + recencyBoost + themeFitBoost;
+}
+
+function spotlightThemeFit(article) {
+  if (state.theme === "all") {
+    return 0;
+  }
+
+  const theme = getTheme(state.theme);
+  const themeTechs = new Set((theme?.top_technologies || []).map((item) => item.name));
+  const articleTechs = new Set(article.technologies || []);
+  const overlap = [...articleTechs].filter((name) => themeTechs.has(name)).length;
+  const ratio = overlap / Math.max(1, articleTechs.size);
+
+  return overlap * 0.6 + ratio * 2 + (overlap === 0 ? -0.6 : 0) + (overlap === 1 ? -0.25 : 0);
 }
 
 function describeThemeStory(themeName, scope) {
